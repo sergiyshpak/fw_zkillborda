@@ -14,16 +14,36 @@ Function CheckDrop(Arg1)
 	CheckDrop =  Replace(dropa,",","")
 End Function
 
-
-Function LocDrop(Arg1)
+Function GetKillHtml(Arg1)
 	xmlhttp.open "get", Arg1, false
 	xmlhttp.send
-	dropText= xmlhttp.responseText
+	GetKillHtml= xmlhttp.responseText
+    
+End Function
+
+
+Function LocDrop(Arg1)
+	dropText= Arg1
     droposSt = InStr(1, dropText,"Location:")+49
 	droposEnd = InStr(droposSt, dropText,"td>")-2
 	dropa = Mid(dropText, droposSt, droposEnd-droposSt)
 	LocDrop =  Replace(dropa,"</a>","   ")
-	
+End Function
+
+Function priceDrop(Arg1)
+	dropText= Arg1
+    droposSt = InStr(1, dropText,"Dropped:")+39
+	droposEnd = InStr(droposSt, dropText,"ISK")-1
+	dropa = Mid(dropText, droposSt, droposEnd-droposSt)
+	priceDrop =  Replace(dropa,"</a>","   ")
+End Function
+
+Function nameshipa(Arg1)
+	dropText= Arg1
+    droposSt = InStr(1, dropText,"readonly=")+21
+	droposEnd = InStr(droposSt, dropText,"]")
+	dropa = Mid(dropText, droposSt, droposEnd-droposSt)
+	nameshipa =  Replace(dropa,"</a>","   ")
 End Function
 
 htmlName="nena_fw_kill.html"
@@ -46,7 +66,7 @@ utcTime= dateTime.GetVarDate (false)
 '''
 
 'resFile.write (FormatDateTime(utcTime,4) & ",ship,bablo,locdrop" & vbCrLf)
-resFile.write ("<tr> <th>"&FormatDateTime(utcTime,4)&"</th> <th>ship</th> <th>bablo</th> <th>location of drop</th>  </tr> " & vbCrLf)
+resFile.write ("<tr> <th>"&FormatDateTime(utcTime,4)&"</th> <th>ship</th> <th>bablo</th> <th>$$drop</th><th>location of drop</th><th>link</th>  </tr> " & vbCrLf)
 
 
 xmlhttp.open "get", URL, false
@@ -74,14 +94,29 @@ for i =1 to  25 '50
 	
 	cur2ast=InStr(cur2st,MyText, "class="+chr(34)+"eveimage img-rounded"+chr(34)+" alt="  )+1
 	cur2aend=InStr(cur2ast+6, MyText, "/")
-	karabl=Mid(MyText, cur2ast+33, cur2aend-cur2ast-34)
+	karabl=Mid(MyText, cur2ast+33, cur2aend-cur2ast-35)
 	'MsgBox  karabl
 
 	
-	lo1111cdrop="X3"
-	lo1111cdrop=LocDrop(kilaLink)
+'<td>
+'<a href="/character/561246054/">Cpt Blastahoe</a>
 	
-	resFile.write ("<tr> <td>"&timekill &"</td> <td>"&karabl &"</td> <td>"&utrata &"</td> <td>"&lo1111cdrop &"</td> </tr> " & vbCrLf)
+'<th>Dropped:</th>
+'<td class="item_dropped">309,050,734.63 ISK</td>	
+	
+	killHtml=GetKillHtml(kilaLink)
+	
+	lo1111cdrop="X3"
+	lo1111cdrop=LocDrop(killHtml)
+	
+	luta="X3"
+	luta=priceDrop(killHtml)
+	
+	'id="eft" name="eft" readonly="readonly">[Confessor, Rimlicker's Confessor]
+	chara="XZ"
+	chara=nameshipa(killHtml)
+	
+	resFile.write ("<tr> <td>"&timekill &"</td> <td>"&chara &"</td> <td>"&utrata &"</td> <td>"&luta &"</td><td>"&lo1111cdrop &"</td> <td><a href=" &kilaLink&">linka</a> </td></tr> " & vbCrLf)
 	'resFile.write (timekill & "," &  karabl & "," & utrata & "," & lo1111cdrop & vbCrLf)
 	
 	'Msgbox "Kill:"+kilaNum+"   Karabl:"+karabl+"  Uron:"+utrata+"   system:"+system+"  region:"+region
